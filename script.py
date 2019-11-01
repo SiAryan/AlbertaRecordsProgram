@@ -174,7 +174,7 @@ def renewRegistration():
             print("Registration number invalid, please try again...")
         else:
             break
-    # TODO Aryan : 
+    # TODO Aryan : Set the new expiry data for the registration
 
 def processBill():
     pass
