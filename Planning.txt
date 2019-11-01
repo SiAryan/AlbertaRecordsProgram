@@ -1,0 +1,211 @@
+Login Screen {
+	- Username field
+	- Password field
+	- Exit button
+
+	On successful username & password we determine the type of user: {
+		- Agent
+			=> Agent Edit Screen
+		- Officer
+			=> Officer Edit Screen
+	}
+}
+
+Agent Edit Screen {
+	- Log out button
+		=> Login Screen
+	- Register a birth button
+		=> Register a birth window
+	- Register a marriage button
+		=> Register a marriage window
+	- Renew vehicle registration button
+		=> Renew vehicle registration window
+	- Process a bill of sale button
+		=> Process a bill of sale window
+	- Process a payment button
+		=> Process a payment window
+	- Get driver abstract button
+		=> Get driver abstract window
+}
+
+Officer Edit Screen {
+	- Log out button
+		=> Login Screen
+	- Issue a ticket button
+		=> Issue a ticket window
+	- Find a car owner button
+		=> Find a car owner window
+}
+
+Register a birth window {
+	- First name field
+	- Last name field
+	- Gender combobox
+	- Birth place field
+	- Parents
+		- First and last name
+	- OK Button
+		=> {
+			Set the registration date to the current date
+			Set the registration place to the city of the agent
+			Assign a unique registration number to the birth record
+			Address and phone are set to the mother's details
+			If none of the parents are not in the database
+				=> Register a person window
+			Register the birth and person
+		}
+	- Cancel button
+		=> Agent Edit Screen
+}
+
+Register a person window {
+	- Two columns: mother, father: {
+		- First name field
+		- Last name field
+		- Birth date calendar	can be null
+		- Birth place field		can be null
+		- Address field			can be null
+		- Phone field			can be null
+	}
+	- OK Button
+		=> {
+			Places these details in the database and closes the window
+		}
+}
+
+Register a marriage window {
+	- Two columns: partner1, partner2: {
+		- First name field
+		- Last name field
+	}
+	- OK Button
+		=> {
+			Assign the current date
+			Assign the place
+			Assign a unique registration number
+			If one of the partners are not in the database
+				=> Register a person window
+			Register the marriage
+		}
+	- Cancel Button
+		=> Agent Edit Screen
+}
+
+Renew vehicle registration window {
+	- Registration number field
+		- Possibly make it a type-able combobox which queries over all the regno's
+		- If not, just make sure the user knows it's an invalid regno before being able to confirm
+	- Confirm button
+		=> {
+			- Only active when the regno is valid
+			If the expiry date is today or before today
+				=> Set the new expiry date to 1 year from today
+			Otherwise
+				=> Set the new expiry date to 1 year from the current expiry date
+		}
+	- Cancel button
+		=> Agent Edit Screen
+}
+
+Process a bill of sale window {
+	- vin field
+		- Make sure the user knows it's an invalid vin before being able to confirm
+	- Name of current owner field
+		- Needs to match the stored name of the most recent owner in the database
+	- Name of new owner field
+	- Plate number for new registration field
+	- Confirm button
+		=> {
+			Expiry date of current registration is set to today
+			New registration has registration date set to today
+			New registration has expiry date set to a year after today
+			New registration number is created for the new registration
+			vin is set
+			Record the new registration
+		}
+	- Cancel button
+		=> Agent Edit Screen
+}
+
+Process a payment window {
+	- Ticket number field
+		- Make sure the user knows it's an invalid ticno before being able to confirm
+	- Amount field
+		- Amount <= {database.tickets.fine} - sum{{database.payments.amount}}
+	- Confirm button
+		=> {
+			Payment date is set to today
+			Create the payment in the database
+		}
+	- Cancel button
+		=> Agent Edit Screen
+}
+
+Get driver abstract window {
+	- First name field
+	- Last name field
+	- Search button
+		=> {
+			Query the database for:
+				- Number of tickets
+				- Number of demerit notices
+				- Total number of demerit points recieved in last two years
+				- Total number of demerit points recieved total
+			Show the queried info
+			- View tickets button
+				=> {
+					Query the database for:
+						- Tickets, organized from latest to oldest
+					For each queried ticket, also query:
+						- Ticket number
+						- Violation date
+						- Violation description
+						- Fine
+						- Registration Number
+						- Make
+						- Model
+					Make this scrollable
+				}
+		}
+	- Cancel button
+		=> Agent Edit Screen
+}
+
+Issue a ticket window {
+	- Registration number field
+	- Panel for showing the person's name, make, model, year, color of car under the regno
+	- Ticket date calendar
+		- default is today
+	- Ticket description field
+	- Fine field
+	- Confirm button
+		=> {
+			Assign a unique ticket number
+			Record the ticket
+		}
+	- Cancel button
+		=> Edit Officer Screen
+}
+
+Find a car owner window {
+	- Make field
+	- Model field
+	- Year field
+	- Color field
+	- Plate field
+	- Search button
+		=> {
+			Query based on the provided fields
+			If there are more than 4 matches
+				=> {
+					Show a table with the make, model, year, color, plate
+					There will be a button beside the row on the left that when clicked will show person's details
+				}
+			Otherwise
+				=> {
+					Show a table with the make, model, year, color, plate, latest reg date, expiry date, name of person
+				}
+		}
+	- Cancel button
+		=> Edit Officer Screen
+}
