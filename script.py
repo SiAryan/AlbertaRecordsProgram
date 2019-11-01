@@ -175,12 +175,59 @@ def renewRegistration():
         else:
             break
     # TODO Aryan : Set the new expiry data for the registration
+    agentScreen()
 
 def processBill():
-    pass
+    print("===============================================================")
+    print("Enter details about the bill of sale:")
+    vin = ""
+    currentowner_fname = ""
+    currentowner_lname = ""
+    vinValid = False
+    nameMatches = False
+    while vinValid == False:
+        vin = getInput(AGENTSUBSCREEN, "Vin: ")
+        # TODO Aryan : Verify if the vin is in the database
+        if vinValid == False:
+            print("That vin was not found in the database! Please re-enter...")
+    while nameMatches == False:
+        currentowner_fname = getInput(AGENTSUBSCREEN, "Current owner first name: ")
+        currentowner_lname = getInput(AGENTSUBSCREEN, "Current owner last name: ")
+        # TODO Aryan : Verify if the name matches the name registered
+        if nameMatches == False:
+            print("That name was not found in the database! Please re-enter...")
+    newowner_fname = getInput(AGENTSUBSCREEN, "New owner first name: ")
+    newowner_lname = getInput(AGENTSUBSCREEN, "New owner last name: ")
+    # TODO Aryan : Check that the person exitsts
+    newownerExists = True
+    if newownerExists == False:
+        print("That name was not found in the database! Transaction cannot be completed.")
+        agentScreen()
+    plateno = getInput(AGENTSUBSCREEN, "Plate number: ")
+    # TODO Aryan : Record the new registration in the database
+    agentScreen()
 
 def processPayment():
-    pass
+    print("===============================================================")
+    print("Enter details about the ticket payment:")
+    tno = ""
+    tnoValid = False
+    while tnoValid == False:
+        tno = getInput(AGENTSUBSCREEN, "Ticket number: ")
+        # TODO Aryan : Verify it's a valid tno
+        if tnoValid == False:
+            print("Ticket number invalid! Please enter a valid ticket number...")
+    maxAmount = 1000
+    # TODO Aryan : Calculate the max payment amount using queries
+    # maxAmount = {database.tickets.fine} - sum{{database.payments.amount}}
+    amount = 0
+    amountValid = False
+    while amountValid == False:
+        amount = int(getInput(AGENTSUBSCREEN, "Amount: "))
+        amountValid = amount <= amountValid
+        if amountValid == False:
+            print("Amount being paid cannot exceed $" + str(maxAmount) + ", please re-enter...")
+    # TODO Aryan : Record the payment
 
 def getAbstract():
     pass
