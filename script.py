@@ -120,6 +120,7 @@ def getInput(screen, printStr):
     ret = input(printStr)
     if ret in ourScreenRules.keys():
         ourScreenRules[ret][0]()
+        return ""
     else:
         return ret
 
@@ -183,7 +184,8 @@ def registerBirth():
     if fatherFound == False:
         registerPerson(AGENTSUBSCREEN, "Father")
     # TODO Aryan : Register the birth
-    agentScreen()
+    print("The birth has been recorded. Congratulations to the parents.")
+    return
 
 def registerMarriage():
     print("===============================================================")
@@ -200,7 +202,8 @@ def registerMarriage():
     if partner2Found == False:
         registerPerson(AGENTSUBSCREEN, "Partner 2")
     # TODO Aryan : Register the marriage
-    agentScreen()
+    print("The marriage has been recorded. Congratulations to the couple.")
+    return
 
 def renewRegistration():
     print("===============================================================")
@@ -214,7 +217,8 @@ def renewRegistration():
         else:
             break
     # TODO Aryan : Set the new expiry data for the registration
-    agentScreen()
+    print("The registration has been renewed.")
+    return
 
 def processBill():
     print("===============================================================")
@@ -244,7 +248,8 @@ def processBill():
         agentScreen()
     plateno = getInput(AGENTSUBSCREEN, "Plate number: ")
     # TODO Aryan : Record the new registration in the database
-    agentScreen()
+    print("The bill of sale has been recorded.")
+    return
 
 def processPayment():
     print("===============================================================")
@@ -267,15 +272,16 @@ def processPayment():
         if amountValid == False:
             print("Amount being paid cannot exceed $" + str(maxAmount) + ", please re-enter...")
     # TODO Aryan : Record the payment
-    agentScreen()
+    print("The payment has been recorded.")
+    return
 
 def getAbstract():
 	print("===============================================================")
-    print("Query a person's driver abstract given a name...:")
+    print("Query a person's driver abstract given a name...")
     fname = getInput(AGENTSUBSCREEN, "First name: ")
     lname = getInput(AGENTSUBSCREEN, "Last name: ")
     # TODO Aryan : Query the database and report the results
-    agentScreen()
+    return
 
 def officerScreen():
 	print("===============================================================")
@@ -286,10 +292,41 @@ def officerScreen():
         print("Please type a valid command.")
 
 def issueTicket():
-    pass
+    print("===============================================================")
+    print("Issue a ticket to a given registration number:")
+    regno = ""
+    regnoValid = False
+    while regnoValid == False:
+    	regno = getInput(OFFICERSUBSCREEN, "Registration number: ")
+    	# TODO Aryan : Check if the registration number is valid
+    	if regnoValid == False:
+    		print("No information was found under that registration number")
+	print("---------------------------------------------------------------")
+    # TODO Aryan : Display the information found under the registration number
+    print("---------------------------------------------------------------")
+    vdate = getInput(OFFICERSUBSCREEN, "Violation date: ")
+    vtext = getInput(OFFICERSUBSCREEN, "Violation text: ")
+    vfine = getInput(OFFICERSUBSCREEN, "Fine amount: ")
+    # TODO Aryan : Record the ticket
+    print("The registration has been ticketed.")
+    return
 
 def findCarOwner():
-    pass
-
-def officerScreen():
-    pass
+    print("===============================================================")
+    print("Find a car owner given the car's information:")
+    make = ""
+    model = ""
+    year = ""
+    color = ""
+    plate = ""
+    while make == "" and model == "" and year == "" and color == "" and plate == "":
+    	make = getInput(OFFICERSUBSCREEN, "Make: ")
+    	model = getInput(OFFICERSUBSCREEN, "Model: ")
+    	year = getInput(OFFICERSUBSCREEN, "Year: ")
+    	color = getInput(OFFICERSUBSCREEN, "Color: ")
+    	plate = getInput(OFFICERSUBSCREEN, "Plate: ")
+    	if make == "" and model == "" and year == "" and color == "" and plate == "":
+    		print("Please provide one or more of the given specifications...")
+    print("---------------------------------------------------------------")
+    # TODO Aryan : Query these values and show the results
+    return
