@@ -5,6 +5,7 @@ LOGINSCREEN = "loginScreen"
 AGENTSCREEN = "agentScreen"
 OFFICERSCREEN = "officerScreen"
 AGENTSUBSCREEN = "agentSubscreen"
+OFFICERSUBSCREEN = "officerSubscreen"
 
 screenRules = {
     STARTSCREEN : {
@@ -35,8 +36,46 @@ screenRules = {
         "exit" : [exit, "Exits the program."],
         "logout" : [loginScreen, "Logs the user out and returns to the login screen."],
         "back" : [agentScreen, "Moves back to the Agent home screen."]
+    },
+    OFFICERSUBSCREEN : {
+    	"exit" : [exit, "Exits the program."],
+        "logout" : [loginScreen, "Logs the user out and returns to the login screen."],
+        "back" : [officerScreen, "Moves back to the Officer home screen."]
     }
 }
+
+def getPersonDetails():
+	fname = input("First name: ")
+	lname = input("Last name: ")
+	birthdate = input("Birth date: ")
+	birthplace = input("Birth place: ")
+	address = input("Address: ")
+	phoneNum = input("Phone number: ")
+	ret = {"fname": fname, "lname": lname, "birthdate": birthdate, "birthplace": birthplace, "address": address, "phone": phoneNum}
+	return ret
+
+def registerPerson(personStr):
+	print("---------------------------------------------------------------")
+	print("The " + personStr + "'s details were not found in the database!")
+	print("Please enter the " + personStr + "'s details:")
+	details = dict()
+	while True:
+		details = getPersonDetails()
+		if details["fname"] == "" or details["lname"] == "":
+			print("First name or last name cannot be blank! Re-enter details...")
+		else:
+			break
+	# TODO Aryan : Store these values in the database
+	print("---------------------------------------------------------------")
+
+def printCommands(screen):
+	print("---------------------------------------------------------------")
+	print("Commands here are:")
+	global screenRules
+	ourScreenRules = screenRules[screen]
+	for command in ourScreenRules.keys():
+		print(command + " => " + ourScreenRules[command][1])
+	print("---------------------------------------------------------------")
 
 def getPersonDetails(parentScreen):
     fname = getInput(parentScreen, "First name: ")
@@ -228,9 +267,23 @@ def processPayment():
         if amountValid == False:
             print("Amount being paid cannot exceed $" + str(maxAmount) + ", please re-enter...")
     # TODO Aryan : Record the payment
+    agentScreen()
 
 def getAbstract():
-    pass
+	print("===============================================================")
+    print("Query a person's driver abstract given a name...:")
+    fname = getInput(AGENTSUBSCREEN, "First name: ")
+    lname = getInput(AGENTSUBSCREEN, "Last name: ")
+    # TODO Aryan : Query the database and report the results
+    agentScreen()
+
+def officerScreen():
+	print("===============================================================")
+    print("Welcome to the Officer home page.")
+    printCommands(OFFICERSCREEN)
+    while True:
+        _ = getInput(OFFICERSCREEN, "> ")
+        print("Please type a valid command.")
 
 def issueTicket():
     pass
