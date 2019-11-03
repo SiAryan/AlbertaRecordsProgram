@@ -38,7 +38,39 @@ def processBillOfSale(vin, cname, nname, plate):
                 (?, ?, ?, ?, ?, ? , ?)''', entry)
     db.commit()
 
+def processPayment(tno, amount):
+    pdate = today.strftime("%Y-%m-%d")
+    c = db.execute('''SELECT * FROM tickets WHERE tno == ?''', [tno])
+    row = c.fetchone()
+    fine = row[2]
+    if amount > fine:
+        return
+    c = db.execute('''SELECT SUM(amount) FROM payments WHERE tno = ? GROUP BY tno''', [tno])
+    rowb = c.fetchone()
+    if rowb == None:
+        entry = [tno, pdate, amount]
+        db.execute('''INSERT INTO payments VALUES
+                        (?, ?, ?)''', entry)
+        db.commit()
+    elif amount <= (fine-rowb[0]):
+        entry = [tno, pdate, amount]
+        db.execute('''INSERT INTO payments VALUES
+                        (?, ?, ?)''', entry)
+        db.commit()
+    else:
+        return
 
+def getDriverAbstract(fname, lname):
+    c = db.execute('''SELECT regno FROM registrations WHERE fname = ? AND lname = ?''', [fname, lname])
+    regno = c.fetchone()[0]
+    c = db.execute('''SELECT SUM(tno) FROM tickets WHERE regno == ?''', [regno])
+    num_tickets = c.fetchone()[0]
+    c = db.execute('''SELECT COUNT(*) FROM demeritNotices WHERE fname = ? AND lname = ?''', [fname, lname])
+    num_dem = c.fetchone()[0]
+    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? GROUP BY fname AND lname''')
+    total_dem = c.fetchone()[0]
+    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''')
+    past2_dem = c.fetchone()[0]
 
 def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
     regplace = getUserCity(user)   
@@ -56,10 +88,7 @@ def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
         run = False
         regno = 1
     if run:
-        print(regno)
         regno = row[0] + 1
-       
-    print(regno)
        
     
     motherinfo = [db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''',parentB).fetchone()[-2], db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''',parentB).fetchone()[-1]] 
@@ -120,9 +149,19 @@ def main():
     #print(c.fetchone())
     #c = db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''', ["Seema","Singh"])
     #print(c.fetchone()[-1])
-    processBillOfSale(1, ["Aryan","Singh"], ["Luke","Kapeluck"], "abc123")
+    #processBillOfSale(1, ["Aryan","Singh"], ["Luke","Kapeluck"], "abc123")
     #renewRegistration(regno)
-
+    fname = "Aryan"
+    lname = "Singh"
+    c = db.execute('''SELECT regno FROM registrations WHERE fname = ? AND lname = ?''', [fname, lname])
+    regno = c.fetchone()[0]
+    c = db.execute('''SELECT SUM(tno) FROM tickets WHERE regno == ?''', [regno])
+    num_tickets = c.fetchone()[0]
+    c = db.execute('''SELECT COUNT(*) FROM demeritNotices WHERE fname = ? AND lname = ?''', [fname, lname])
+    num_dem = c.fetchone()[0]    
+    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''', [fname, lname])
+    past2_dem = c.fetchone()[0]
+    print(past2_dem)
     
 
 if __name__ == '__main__':
