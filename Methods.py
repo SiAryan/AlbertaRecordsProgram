@@ -18,6 +18,26 @@ def renewRegistration(regno):
     db.execute('''UPDATE registrations SET regdate=?, expiry=?''', entry)
     db.commit()
 
+def processBillOfSale(vin, cname, nname, plate):
+    pdate = today.strftime("%Y-%m-%d")
+    nums = pdate.split('-')
+    nums[0] = str(int(nums[0]) + 1)
+    fdate = '-'.join(nums)
+
+    c = db.execute('''SELECT * FROM registrations GROUP BY NULL HAVING MAX(regno)''')
+    run = True
+    regno = 1
+    row = c.fetchone()
+    
+    if row == None:
+        run = False
+    if run:
+       regno = row[0] + 1
+    entry = [regno, pdate, fdate, plate, vin, nname[0], nname[1]]
+    db.execute('''INSERT INTO registrations VALUES
+                (?, ?, ?, ?, ?, ? , ?)''', entry)
+    db.commit()
+
 
 
 def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
@@ -60,7 +80,7 @@ def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
 def registerMarrige(user, pA, pB):
     date = today.strftime("%Y-%m-%d")
     
-    c = db.execute('''SELECT * FROM marriages GROUP BY regno HAVING MAX(regno)''')
+    c = db.execute('''SELECT * FROM marriages GROUP BY NULL HAVING MAX(regno)''')
     run = True
     regno = 1
     row = c.fetchone()
@@ -87,8 +107,8 @@ def registerMarrige(user, pA, pB):
 
 def main():
     
-    c = db.execute("SELECT * FROM users;")
-    registerBirth(c, "g", "Singh", "female", ["kk", "Singh"], ["Seema","Singh"], "2008-04-11", "Allahabad")
+    #c = db.execute("SELECT * FROM users;")
+    #registerBirth(c, "g", "Singh", "female", ["kk", "Singh"], ["Seema","Singh"], "2008-04-11", "Allahabad")
     #regno = 1
     #c = db.execute('''SELECT * FROM registrations WHERE regno == ?''', [regno])
     #print(c.fetchone())
@@ -100,7 +120,7 @@ def main():
     #print(c.fetchone())
     #c = db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''', ["Seema","Singh"])
     #print(c.fetchone()[-1])
-   
+    processBillOfSale(1, ["Aryan","Singh"], ["Luke","Kapeluck"], "abc123")
     #renewRegistration(regno)
 
     
