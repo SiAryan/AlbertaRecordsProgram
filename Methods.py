@@ -1,29 +1,46 @@
 import sqlite3
-import time
+from datetime import date
+today = date.today()
 
 with sqlite3.connect('p1.db') as db:
     c = db.cursor()
+
 # get the user city
-
-
 def getUserCity(c):
     return c.fetchone()[-1]
+
+def renewRegistration(regno):
+    pdate = today.strftime("%Y-%m-%d")
+    nums = pdate.split('-')
+    nums[0] = str(int(nums[0]) + 1)
+    fdate = '-'.join(nums)
+    entry = [pdate, fdate]
+    db.execute('''UPDATE registrations SET regdate=?, expiry=?''', entry)
+    db.commit()
 
 
 
 def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
     regplace = getUserCity(user)   
-    date = time.strftime("%Y-%M-%D")
+    date = today.strftime("%Y-%m-%d")
     f_fname = parentA[0]
     f_lname = parentA[1]
     m_fname = parentB[0]
     m_lname = parentB[1]
-    
-    c = db.execute('''SELECT * FROM births GROUP BY regno HAVING MAX(regno)''')
-    if (c.fetchone() == None): 
-        regno = 1   
-    elif (c.fetchone() != None): 
-        regno = c.fetchone()[0] + 1
+   
+    c = db.execute('''SELECT * FROM births GROUP BY NULL HAVING MAX(regno)''')
+    run = True
+    regno = None
+    row = c.fetchone()
+    if row == None:
+        run = False
+        regno = 1
+    if run:
+        print(regno)
+        regno = row[0] + 1
+       
+    print(regno)
+       
     
     motherinfo = [db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''',parentB).fetchone()[-2], db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''',parentB).fetchone()[-1]] 
     address = motherinfo[0]
@@ -41,17 +58,23 @@ def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
 
 
 def registerMarrige(user, pA, pB):
-    date = time.strftime("%Y-%M-%D")
-    regno = 0
+    date = today.strftime("%Y-%m-%d")
+    
     c = db.execute('''SELECT * FROM marriages GROUP BY regno HAVING MAX(regno)''')
-    if (c.fetchone() == None): 
-        regno = 1   
-    elif (c.fetchone() != None): 
-        regno = c.fetchone()[0] + 1
+    run = True
+    regno = 1
+    row = c.fetchone()
+    
+    if row == None:
+        run = False
+    if run:
+       regno = row[0] + 1
+        
+
     regplace = getUserCity(user)
     fnameA = pA[0]
     lnameA = pA[1]
-    fnameB = pA[0]
+    fnameB = pB[0]
     lnameB = pB[1]
     entry = [regno, date, regplace, fnameA, lnameA, fnameB, lnameB]
 
@@ -60,11 +83,15 @@ def registerMarrige(user, pA, pB):
     db.commit()
 
 
+
+
 def main():
     
     c = db.execute("SELECT * FROM users;")
-    #registerBirth(c, "k", "Singh", "female", ["kk", "Singh"], ["Seema","Singh"], "2008-04-11", "Allahabad")
-    
+    registerBirth(c, "g", "Singh", "female", ["kk", "Singh"], ["Seema","Singh"], "2008-04-11", "Allahabad")
+    #regno = 1
+    #c = db.execute('''SELECT * FROM registrations WHERE regno == ?''', [regno])
+    #print(c.fetchone())
     #c = db.execute("SELECT * FROM users;")
     #registerMarrige(c, ["kk","Singh"], ["Seema", "Singh"])
     #c.execute('''SELECT * FROM users''')
@@ -73,11 +100,10 @@ def main():
     #print(c.fetchone())
     #c = db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''', ["Seema","Singh"])
     #print(c.fetchone()[-1])
-    c = db.execute('''SELECT * FROM births GROUP BY regno HAVING MAX(regno)''')
-    print(c.fetchone()[0])
+   
+    #renewRegistration(regno)
 
-
-
+    
 
 if __name__ == '__main__':
     main()
