@@ -156,7 +156,7 @@ def processBill():
         agentScreen()
     plateno = getInput(AGENTSUBSCREEN, "Plate number: ")
     # TODO Aryan : Record the new registration in the database DONE
-    m.processBillOfSale(vin, [newowner_fname, newowner_lname], [currentowner_fname, currentowner_lname], plateno)
+    m.processBillOfSale(vin, [currentowner_fname, currentowner_lname], [newowner_fname, newowner_lname], plateno)
     print("The bill of sale has been recorded.")
     print("===============================================================")
     return
@@ -190,8 +190,14 @@ def processPayment():
 def getAbstract():
     print("===============================================================")
     print("Query a person's driver abstract given a name...")
-    fname = getInput(AGENTSUBSCREEN, "First name: ")
-    lname = getInput(AGENTSUBSCREEN, "Last name: ")
+    registered = False
+    while registered  == False:
+        fname = getInput(AGENTSUBSCREEN, "First name: ")
+        lname = getInput(AGENTSUBSCREEN, "Last name: ")
+        registered = m.checkregName(fname, lname)
+        if registered == False:
+            print("No tickets for this person")
+
     validResponse = False
     ordering = ""
     while validResponse == False:

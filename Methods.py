@@ -79,8 +79,14 @@ def renewRegistration(regno):
     nums[0] = str(int(nums[0]) + 1)
     fdate = '-'.join(nums)
     entry = [pdate, fdate]
-    db.execute('''UPDATE registrations SET regdate=?, expiry=?''', entry)
-    db.commit()
+    c = db.execute('''SELECT * FROM registrations WHERE regno == ?''', [regno])
+    row = c.fetchone()
+    if row[2] > pdate:
+        db.execute('''UPDATE registrations SET expiry=?''', [fdate])
+        db.commit()
+    elif row[2] < pdate:
+        db.execute('''UPDATE registrations SET regdate=?, expiry=?''', entry)
+        db.commit()
 
 def processBillOfSale(vin, cname, nname, plate):
     pdate = today.strftime("%Y-%m-%d")
@@ -111,6 +117,7 @@ def maxAmount(tno):
     if rowb == None:
         return fine
     else:
+        #print(rowb)
         return fine - rowb[0]
 
 
@@ -150,10 +157,18 @@ def getDriverAbstract(fname, lname, ordered):
         WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ''', [fname, lname])   
         ticketRow = c.fetchall()
 
-    print([num_tickets, num_dem, total_dem, past2_dem])
+    print("number of tickets: " + str(num_tickets) + " number of demerit Notices :" + str(num_dem) + " Total demerit points :" + str(total_dem) + " Demerit points in the past 2 year :" + str(past2_dem))
     
     for i in ticketRow:
         print(i)
+
+def checkregName(fname, lname):
+    c = db.execute('''SELECT * FROM tickets, registrations WHERE fname == ? AND lname == ? and registrations.regno = tickets.regno''', [fname, lname])
+    row = c.fetchone()
+    if not(row == None):
+        return True
+    else:
+        return False
 
 
 def checkValidRegistration(regno):
@@ -202,10 +217,11 @@ def FindCarOwner(make, model, year, color, plate):
 
     all_sets = [row_a, row_b, row_c, row_d, row_e]
     notNone = []
+
     for i in all_sets:
-        if not(i == None):
+        if i:
             notNone.append(i)
-    
+        
     for i in notNone:
         print(i)
    
@@ -305,42 +321,3 @@ def registerPerson(fname, lname, bdate, bplace, address, phone):
     db.commit()
 
 
-def main():
-    
-    #c = db.execute("SELECT * FROM users;")
-    uid = 1
-    registerBirth(uid, "o", "Singh", "female", ["kk", "Singh"], ["Seema","Singh"], "2008-04-11", "Allahabad")
-    #regno = 1
-    #c = db.execute('''SELECT * FROM registrations WHERE regno == ?''', [regno])
-    #print(c.fetchone())
-    #c = db.execute("SELECT * FROM users;")
-    #registerMarrige(c, ["kk","Singh"], ["Seema", "Singh"])
-    #c.execute('''SELECT * FROM users''')
-    #print(getUserCity(c))
-    #c = db.execute('''SELECT MAX(regno) FROM births''')
-    #print(c.fetchone())
-    #c = db.execute('''SELECT * FROM persons WHERE fname == (?) AND lname == (?)''', ["Seema","Singh"])
-    #print(c.fetchone()[-1])
-    #processBillOfSale(1, ["Aryan","Singh"], ["Luke","Kapeluck"], "abc123")
-    #renewRegistration(regno)
-    fname = "Aryan"
-    lname = "Singh"
-    c = db.execute('''SELECT regno FROM registrations WHERE fname = ? AND lname = ?''', [fname, lname])
-    regno = c.fetchone()[0]
-    c = db.execute('''SELECT SUM(tno) FROM tickets WHERE regno == ?''', [regno])
-    num_tickets = c.fetchone()[0]
-    c = db.execute('''SELECT COUNT(*) FROM demeritNotices WHERE fname = ? AND lname = ?''', [fname, lname])
-    num_dem = c.fetchone()[0]    
-    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''', [fname, lname])
-    past2_dem = c.fetchone()[0]
-    c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
-    WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER BY t.vdate desc''', [fname, lname])   
-    ticketRow = c.fetchall()
-  
-    pA = ["Seea", "Singh"]
-    pB = ["kk", "Singh"]
-    #print(checkParents(pA, pB))
-
-
-if __name__ == '__main__':
-    main()
