@@ -16,7 +16,9 @@ Software Design:
 
 	We did not think it was necessary to apply a UI design pattern considering the small scale of the application, this also simplified the programming and allowed for easy modularity.
 
-	//
+	The methods file contains all of the backend processes for the sake of cleanliness when implementing the UI. The connection is established and multiple methods are implemented to query the databases. The UI functions provide the task that is requied to 
+	be completed and the methods file contains specific functions that
+	query or insert data in the database. 
 
 Testing Strategy:
 	
@@ -24,7 +26,9 @@ Testing Strategy:
 
 	The front-end was tested by checking if every command was implemented correctly and all screens were shown as intended. If the program threw an error or didn't display as intended, then we know there was an error that needed to be fixed. If we could get through the whole program without that happening then we know it was done correctly
 
-	//
+	The backend was tested using with remote inserts and queries in the main method of the database. Then after the methods and script
+	files were integrated, the UI was again used to debug the database
+	queries to check for correct inserts and outputs.
 
 Group Work Strategy:
 
@@ -37,6 +41,7 @@ Group Work Strategy:
 	Work started on October 30th for the Python application. Work ended on November 30th.
 	Luke worked approximately 16 hours throughout the days stated, making progress on the design of the UI on Wednesday and Thursday mainly, and programming the UI and integrating the back-end on the remaining days. Part of the last couple days were spent helping with the back-end and integrating the back-end with the front end.
 
-	//
+	The backend was first developed without any integration with the 
+	frontend, establishing basic methods that instert data or query the database. Then upon integrating the front and back, additional method were developed for checking existing values in the database/ checking for partners and such.  
 
 	Luke and Aryan, being friends had a relatively easy time coordinating the work effort. Work was posted to a GitHub repository and source control was used to coordinate the programming. Both teammates met up multiple days to work on the project and test. Other communication was done over texting and GitHub.
