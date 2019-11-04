@@ -162,20 +162,21 @@ def processPayment():
 	tnoValid = False
 	while tnoValid == False:
 		tno = getInput(AGENTSUBSCREEN, "Ticket number: ")
-		# TODO Aryan : Verify it's a valid tno
+		# TODO Aryan : Verify it's a valid tno DONE
+		tnoValid = m.verifyTno(tno)
 		if tnoValid == False:
 			print("Ticket number invalid! Please enter a valid ticket number...")
-	maxAmount = 1000
-	# TODO Aryan : Calculate the max payment amount using queries
-	# maxAmount = {database.tickets.fine} - sum{{database.payments.amount}}
+	maxAmount = m.maxAmount(tno)
+	# TODO Aryan : Calculate the max payment amount using queries DONE
+	# maxAmount = {database.tickets.fine} - sum{{database.payments.amount}} DONE
 	amount = 0
 	amountValid = False
 	while amountValid == False:
 		amount = int(getInput(AGENTSUBSCREEN, "Amount: "))
-		amountValid = amount <= amountValid
+		amountValid = amount <= maxAmount
 		if amountValid == False:
 			print("Amount being paid cannot exceed $" + str(maxAmount) + ", please re-enter...")
-	# TODO Aryan : Record the payment
+	m.processPayment(tno, amount)
 	print("The payment has been recorded.")
 	print("===============================================================")
 	return
@@ -185,7 +186,8 @@ def getAbstract():
 	print("Query a person's driver abstract given a name...")
 	fname = getInput(AGENTSUBSCREEN, "First name: ")
 	lname = getInput(AGENTSUBSCREEN, "Last name: ")
-	# TODO Aryan : Query the database and report the results
+	# TODO Aryan : Query the database and report the results 
+	m.getDriverAbstract(fname, lname)
 	print("===============================================================")
 	return
 
@@ -297,7 +299,7 @@ def registerPerson(personStr):
 			print("First name or last name cannot be blank! Re-enter details...")
 		else:
 			break
-	# TODO Aryan : Store these values in the database
+	# TODO Aryan : Store these values in the database DONE
 	m.registerPerson(details['fname'], details['lname'], details['birthdate'], details['birthplace'], details['address'], details['phone'])
 
 	print("---------------------------------------------------------------")
@@ -332,7 +334,7 @@ def registerPerson(parentScreen, personStr):
 			print("First name or last name cannot be blank! Re-enter details...")
 		else:
 			break
-	# TODO Aryan : Store these values in the database
+	# TODO Aryan : Store these values in the database DONE
 	m.registerPerson(details['fname'], details['lname'], details['birthdate'], details['birthplace'], details['address'], details['phone'])
 	print("---------------------------------------------------------------")
 
@@ -357,8 +359,8 @@ def getInput(screen, printStr):
 
 """ This method will return 0 for invalid, 1 for agent, 2 for officer """
 def getUserType(username, password):
-	# TODO Aryan : Validate the username and password logins
-	# TODO Aryan : Find the user's type
+	# TODO Aryan : Validate the username and password logins KINDA DONE
+	# TODO Aryan : Find the user's type DONE
 	row = m.checkUser(username, password)
 	if row == 0:
 		return 0

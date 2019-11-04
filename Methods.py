@@ -93,27 +93,26 @@ def processBillOfSale(vin, cname, nname, plate):
                 (?, ?, ?, ?, ?, ? , ?)''', entry)
     db.commit()
 
-def processPayment(tno, amount):
-    pdate = today.strftime("%Y-%m-%d")
+def maxAmount(tno):
     c = db.execute('''SELECT * FROM tickets WHERE tno == ?''', [tno])
     row = c.fetchone()
     fine = row[2]
-    if amount > fine:
-        return
     c = db.execute('''SELECT SUM(amount) FROM payments WHERE tno = ? GROUP BY tno''', [tno])
     rowb = c.fetchone()
     if rowb == None:
-        entry = [tno, pdate, amount]
-        db.execute('''INSERT INTO payments VALUES
-                        (?, ?, ?)''', entry)
-        db.commit()
-    elif amount <= (fine-rowb[0]):
-        entry = [tno, pdate, amount]
-        db.execute('''INSERT INTO payments VALUES
-                        (?, ?, ?)''', entry)
-        db.commit()
+        return fine
     else:
-        return
+        return fine - rowb[0]
+
+def processPayment(tno, amount):
+    pdate = today.strftime("%Y-%m-%d")
+   
+    entry = [tno, pdate, amount]
+    db.execute('''INSERT INTO payments VALUES
+                    (?, ?, ?)''', entry)
+    db.commit()
+    
+
 
 def getDriverAbstract(fname, lname):
     c = db.execute('''SELECT regno FROM registrations WHERE fname = ? AND lname = ?''', [fname, lname])
@@ -122,14 +121,29 @@ def getDriverAbstract(fname, lname):
     num_tickets = c.fetchone()[0]
     c = db.execute('''SELECT COUNT(*) FROM demeritNotices WHERE fname = ? AND lname = ?''', [fname, lname])
     num_dem = c.fetchone()[0]
-    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? GROUP BY fname AND lname''')
+    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? GROUP BY fname AND lname''', [fname, lname])
     total_dem = c.fetchone()[0]
-    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''')
+    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''', [fname, lname])
     past2_dem = c.fetchone()[0]
     c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
     WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER by t.vdate desc''', [fname, lname])   
     ticketRow = c.fetchall()
 
+    print([num_tickets, num_dem, total_dem, past2_dem])
+    
+    for i in ticketRow:
+        print(i)
+
+
+
+
+def verifyTno(tno):
+    c = db.execute('''SELECT * FROM tickets WHERE tno = ?''', [tno])
+    row = c.fetchone()
+    if not(row == None):
+        return True
+    else:
+        return False
 
 def checkVin(vin):
     c = db.execute('''SELECT * FROM vehicles WHERE vin = ?''', [vin])
