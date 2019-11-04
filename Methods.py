@@ -150,17 +150,49 @@ def getDriverAbstract(fname, lname, ordered):
     
     if order:
         c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
-        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER by t.vdate desc''', [fname, lname])   
+        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER by t.vdate desc LIMIT 5''', [fname, lname])   
         ticketRow = c.fetchall()
     else:
         c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
-        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ''', [fname, lname])   
+        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? LIMIT 5''', [fname, lname])   
         ticketRow = c.fetchall()
 
     print("number of tickets: " + str(num_tickets) + " number of demerit Notices :" + str(num_dem) + " Total demerit points :" + str(total_dem) + " Demerit points in the past 2 year :" + str(past2_dem))
     
     for i in ticketRow:
         print(i)
+
+def getDriverAbstractB(fname, lname, ordered):
+    order = False
+    if ordered == "yes":
+        order = True
+    elif ordered == "no":
+        order = False
+    c = db.execute('''SELECT regno FROM registrations WHERE fname = ? AND lname = ?''', [fname, lname])
+    regno = c.fetchone()[0]
+    c = db.execute('''SELECT SUM(tno) FROM tickets WHERE regno == ?''', [regno])
+    num_tickets = c.fetchone()[0]
+    c = db.execute('''SELECT COUNT(*) FROM demeritNotices WHERE fname = ? AND lname = ?''', [fname, lname])
+    num_dem = c.fetchone()[0]
+    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? GROUP BY fname AND lname''', [fname, lname])
+    total_dem = c.fetchone()[0]
+    c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''', [fname, lname])
+    past2_dem = c.fetchone()[0]
+    
+    if order:
+        c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
+        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER by t.vdate desc''', [fname, lname])   
+        ticketRow = c.fetchall()
+    else:
+        c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
+        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ?''', [fname, lname])   
+        ticketRow = c.fetchall()
+
+    #print("number of tickets: " + str(num_tickets) + " number of demerit Notices :" + str(num_dem) + " Total demerit points :" + str(total_dem) + " Demerit points in the past 2 year :" + str(past2_dem))
+    
+    for i in ticketRow:
+        print(i)
+
 
 def checkregName(fname, lname):
     c = db.execute('''SELECT * FROM tickets, registrations WHERE fname == ? AND lname == ? and registrations.regno = tickets.regno''', [fname, lname])

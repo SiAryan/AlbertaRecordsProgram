@@ -208,6 +208,11 @@ def getAbstract():
             print("Please enter a response of either 'yes' or 'no'.")
     # TODO Aryan : Query the database and report the results DONE  
     m.getDriverAbstract(fname, lname, ordering)
+    getall = getInput(AGENTSCREEN, "get all ? (yes, no): ")
+    if getall == "yes":
+        m.getDriverAbstractB(fname, lname, ordering)
+    elif getall == "no":
+        print("-------------------------------------------------------------")
     print("===============================================================")
     return
 
