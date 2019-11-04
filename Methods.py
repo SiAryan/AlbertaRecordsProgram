@@ -113,6 +113,7 @@ def maxAmount(tno):
     else:
         return fine - rowb[0]
 
+
 def processPayment(tno, amount):
     pdate = today.strftime("%Y-%m-%d")
    
@@ -182,13 +183,36 @@ def issueTicket(regno, vdate, violation, fine):
     db.commit()
 
 def FindCarOwner(make, model, year, color, plate):
-    entry = [model, make, color, year, plate]
-    db.execute('''SELECT * FROM vehicles v, registrations r 
-                    WHERE (v.model = ? OR v.make = ? OR v.color = ? OR v.year = ? OR r.plate = ?) AND v.vin = r.vin''', entry)
-    row = c.fetchall()
-    for i in row:
-        print(i)
+    
+    c = db.execute('''SELECT r.regno, r.fname, r.lname FROM vehicles v, registrations r
+                    WHERE v.vin = r.vin AND v.make = ?''', [make])
+    row_a = c.fetchall()
+    c = db.execute('''SELECT r.regno, r.fname, r.lname FROM vehicles v, registrations r
+                    WHERE v.vin = r.vin AND v.model = ?''', [model])
+    row_b = c.fetchall()
+    c = db.execute('''SELECT r.regno, r.fname, r.lname FROM vehicles v, registrations r
+                    WHERE v.vin = r.vin AND v.year = ?''', [year])
+    row_c = c.fetchall()
+    c = db.execute('''SELECT r.regno, r.fname, r.lname FROM vehicles v, registrations r
+                    WHERE v.vin = r.vin AND v.color = ?''', [color])
+    row_d = c.fetchall()
+    c = db.execute('''SELECT r.regno, r.fname, r.lname FROM vehicles v, registrations r
+                    WHERE v.vin = r.vin AND r.plate = ?''', [plate])
+    row_e = c.fetchall()
 
+    all_sets = [row_a, row_b, row_c, row_d, row_e]
+    notNone = []
+    for i in all_sets:
+        if not(i == None):
+            notNone.append(i)
+    
+    for i in notNone:
+        print(i)
+   
+
+    
+   
+   
 
 def verifyTno(tno):
     c = db.execute('''SELECT * FROM tickets WHERE tno = ?''', [tno])
