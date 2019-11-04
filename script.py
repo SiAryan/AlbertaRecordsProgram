@@ -130,24 +130,27 @@ def processBill():
 	nameMatches = False
 	while vinValid == False:
 		vin = getInput(AGENTSUBSCREEN, "Vin: ")
-		# TODO Aryan : Verify if the vin is in the database
+		vinValid = m.checkVin(vin)
+		# TODO Aryan : Verify if the vin is in the database DONE
 		if vinValid == False:
 			print("That vin was not found in the database! Please re-enter...")
 	while nameMatches == False:
 		currentowner_fname = getInput(AGENTSUBSCREEN, "Current owner first name: ")
 		currentowner_lname = getInput(AGENTSUBSCREEN, "Current owner last name: ")
-		# TODO Aryan : Verify if the name matches the name registered
+		# TODO Aryan : Verify if the name matches the name registered DONE
+		nameMatches = m.checkPerson([currentowner_fname, currentowner_lname])
 		if nameMatches == False:
 			print("That name was not found in the database! Please re-enter...")
 	newowner_fname = getInput(AGENTSUBSCREEN, "New owner first name: ")
 	newowner_lname = getInput(AGENTSUBSCREEN, "New owner last name: ")
-	# TODO Aryan : Check that the person exitsts
-	newownerExists = True
+	# TODO Aryan : Check that the person exitsts DONE
+	newownerExists = m.checkPerson([newowner_fname, newowner_lname])
 	if newownerExists == False:
 		print("That name was not found in the database! Transaction cannot be completed.")
 		agentScreen()
 	plateno = getInput(AGENTSUBSCREEN, "Plate number: ")
-	# TODO Aryan : Record the new registration in the database
+	# TODO Aryan : Record the new registration in the database DONE
+	m.processBillOfSale(vin, [newowner_fname, newowner_lname], [currentowner_fname, currentowner_lname], plateno)
 	print("The bill of sale has been recorded.")
 	print("===============================================================")
 	return

@@ -131,6 +131,22 @@ def getDriverAbstract(fname, lname):
     ticketRow = c.fetchall()
 
 
+def checkVin(vin):
+    c = db.execute('''SELECT * FROM vehicles WHERE vin = ?''', [vin])
+    row = c.fetchone()
+    if not(row == None):
+        return True
+    else:
+        return False
+
+def checkPerson(person):
+    c = db.execute('''SELECT * FROM persons WHERE fname = ? AND lname = ?''', person)
+    row = c.fetchone()
+    if not(row == None):
+        return True
+    else:
+        return False
+
 
 def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
     regplace = getUserCity(user)   
