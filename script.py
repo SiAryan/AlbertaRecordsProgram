@@ -48,8 +48,8 @@ def registerBirth():
     print("Enter birth details:")
     fname = getInput(AGENTSUBSCREEN, "First name: ")
     lname = getInput(AGENTSUBSCREEN, "Last name: ")
-    # TODO Aryan : Check if the name already exists
-    existsAlready = False
+    # TODO Aryan : Check if the name already exists DONE
+    existsAlready = m.nameExists(fname, lname)
     if existsAlready == True:
         print("This person already exists, cannot register.")
         print("===============================================================")
@@ -200,8 +200,8 @@ def getAbstract():
             validResponse = True
         else:
             print("Please enter a response of either 'yes' or 'no'.")
-    # TODO Aryan : Query the database and report the results 
-    m.getDriverAbstract(fname, lname)
+    # TODO Aryan : Query the database and report the results DONE  
+    m.getDriverAbstract(fname, lname, ordering)
     print("===============================================================")
     return
 
@@ -214,46 +214,51 @@ def officerScreen():
         print("Please type a valid command.")
 
 def issueTicket():
-    print("===============================================================")
-    print("Issue a ticket to a given registration number:")
-    regno = ""
-    regnoValid = False
-    while regnoValid == False:
-        regno = getInput(OFFICERSUBSCREEN, "Registration number: ")
-        # TODO Aryan : Check if the registration number is valid
-        if regnoValid == False:
-            print("No information was found under that registration number")
-    print("---------------------------------------------------------------")
-    # TODO Aryan : Display the information found under the registration number
-    print("---------------------------------------------------------------")
-    vdate = getInput(OFFICERSUBSCREEN, "Violation date: ")
-    vtext = getInput(OFFICERSUBSCREEN, "Violation text: ")
-    vfine = getInput(OFFICERSUBSCREEN, "Fine amount: ")
-    # TODO Aryan : Record the ticket
-    print("The registration has been ticketed.")
-    print("===============================================================")
-    return
+	print("===============================================================")
+	print("Issue a ticket to a given registration number:")
+	regno = ""
+	regnoValid = False
+	while regnoValid == False:
+		regno = getInput(OFFICERSUBSCREEN, "Registration number: ")
+		# TODO Aryan : Check if the registration number is valid DONE
+		regnoValid = m.checkValidRegistration(regno)
+
+		if regnoValid == False:
+			print("No information was found under that registration number")
+	print("---------------------------------------------------------------")
+    # TODO Aryan : Display the information found under the registration number DONE
+
+	print("---------------------------------------------------------------")
+	vdate = getInput(OFFICERSUBSCREEN, "Violation date: ")
+	vtext = getInput(OFFICERSUBSCREEN, "Violation text: ")
+	vfine = getInput(OFFICERSUBSCREEN, "Fine amount: ")
+    # TODO Aryan : Record the ticket DONE
+	m.issueTicket(regno, vdate, vtext, vfine)
+	print("The registration has been ticketed.")
+	print("===============================================================")
+	return
 
 def findCarOwner():
-    print("===============================================================")
-    print("Find a car owner given the car's information:")
-    make = ""
-    model = ""
-    year = ""
-    color = ""
-    plate = ""
-    while make == "" and model == "" and year == "" and color == "" and plate == "":
-        make = getInput(OFFICERSUBSCREEN, "Make: ")
-        model = getInput(OFFICERSUBSCREEN, "Model: ")
-        year = getInput(OFFICERSUBSCREEN, "Year: ")
-        color = getInput(OFFICERSUBSCREEN, "Color: ")
-        plate = getInput(OFFICERSUBSCREEN, "Plate: ")
-        if make == "" and model == "" and year == "" and color == "" and plate == "":
-            print("Please provide one or more of the given specifications...")
-    print("---------------------------------------------------------------")
-    # TODO Aryan : Query these values and show the results
-    print("===============================================================")
-    return
+	print("===============================================================")
+	print("Find a car owner given the car's information:")
+	make = ""
+	model = ""
+	year = ""
+	color = ""
+	plate = ""
+	while make == "" and model == "" and year == "" and color == "" and plate == "":
+		make = getInput(OFFICERSUBSCREEN, "Make: ")
+		model = getInput(OFFICERSUBSCREEN, "Model: ")
+		year = getInput(OFFICERSUBSCREEN, "Year: ")
+		color = getInput(OFFICERSUBSCREEN, "Color: ")
+		plate = getInput(OFFICERSUBSCREEN, "Plate: ")
+		if make == "" and model == "" and year == "" and color == "" and plate == "":
+			print("Please provide one or more of the given specifications...")
+	print("---------------------------------------------------------------")
+	# TODO Aryan : Query these values and show the results
+	m.FindCarOwner(make, model, year, color, plate)
+	print("===============================================================")
+	return
 
 screenRules = {
     STARTSCREEN : {
@@ -373,7 +378,7 @@ def getInput(screen, printStr):
 
 """ This method will return 0 for invalid, 1 for agent, 2 for officer """
 def getUserType(username, password):
-    # TODO Aryan : Validate the username and password logins KINDA DONE
+    # TODO Aryan : Validate the username and password logins DONE
     # TODO Aryan : Find the user's type DONE
     row = m.checkUser(username, password)
     if row == 0:
