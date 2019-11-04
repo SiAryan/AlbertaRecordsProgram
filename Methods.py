@@ -11,6 +11,15 @@ def getUserCity(uid):
     #print(c.fetchone())
     return c.fetchone()[-1]
 
+def nameExists(fname, lname):
+    c = db.execute('''SELECT * FROM persons WHERE fname = ? AND lname = ?''', [fname, lname])
+    row = c.fetchone()
+    if not(row == None):
+        return True
+    else:
+        return False    
+
+
 def checkPartners(p1, p2):
     c = db.execute('''SELECT * FROM persons WHERE fname = ? AND lname = ?''', p1)
     row_a = c.fetchone()
@@ -114,7 +123,12 @@ def processPayment(tno, amount):
     
 
 
-def getDriverAbstract(fname, lname):
+def getDriverAbstract(fname, lname, ordered):
+    order = False
+    if ordered == "yes":
+        order = True
+    elif ordered == "no":
+        order = False
     c = db.execute('''SELECT regno FROM registrations WHERE fname = ? AND lname = ?''', [fname, lname])
     regno = c.fetchone()[0]
     c = db.execute('''SELECT SUM(tno) FROM tickets WHERE regno == ?''', [regno])
@@ -125,9 +139,15 @@ def getDriverAbstract(fname, lname):
     total_dem = c.fetchone()[0]
     c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''', [fname, lname])
     past2_dem = c.fetchone()[0]
-    c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
-    WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER by t.vdate desc''', [fname, lname])   
-    ticketRow = c.fetchall()
+    
+    if order:
+        c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
+        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER by t.vdate desc''', [fname, lname])   
+        ticketRow = c.fetchall()
+    else:
+        c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
+        WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ''', [fname, lname])   
+        ticketRow = c.fetchall()
 
     print([num_tickets, num_dem, total_dem, past2_dem])
     
@@ -135,6 +155,39 @@ def getDriverAbstract(fname, lname):
         print(i)
 
 
+def checkValidRegistration(regno):
+    c = db.execute('''SELECT r.fname, r.lname, v.make, v.model, v.year, v.color FROM registrations r, vehicles v    
+        WHERE r.regno = ? AND r.vin = v.vin''', [regno])
+    row = c.fetchone()
+    
+    print(row)
+    if not(row == None):
+        return True
+    else:
+        return False    
+
+def issueTicket(regno, vdate, violation, fine):
+    c = db.execute('''SELECT * FROM tickets GROUP BY NULL HAVING MAX(tno)''')
+    run = True
+    tno = None
+    row = c.fetchone()
+    if row == None:
+        run = False
+        tno = 1
+    if run:
+        tno = row[0] + 1
+    
+    entry = [tno, regno, fine, violation, vdate]
+    db.execute('''INSERT INTO tickets values (?, ?, ?, ?, ?)''', entry)
+    db.commit()
+
+def FindCarOwner(make, model, year, color, plate):
+    entry = [model, make, color, year, plate]
+    db.execute('''SELECT * FROM vehicles v, registrations r 
+                    WHERE (v.model = ? OR v.make = ? OR v.color = ? OR v.year = ? OR r.plate = ?) AND v.vin = r.vin''', entry)
+    row = c.fetchall()
+    for i in row:
+        print(i)
 
 
 def verifyTno(tno):
