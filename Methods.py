@@ -220,9 +220,11 @@ def FindCarOwner(make, model, year, color, plate):
 
     for i in all_sets:
         if i:
-            notNone.append(i)
-        
-    for i in notNone:
+            notNone.append(set(i))
+
+
+    final = set.intersection(*notNone)
+    for i in final:
         print(i)
    
 
