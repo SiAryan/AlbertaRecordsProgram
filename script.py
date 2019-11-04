@@ -1,5 +1,8 @@
 import getpass
 import sys
+import Methods as m
+
+uid = None
 
 STARTSCREEN = "startScreen"
 LOGINSCREEN = "loginScreen"
@@ -46,19 +49,25 @@ def registerBirth():
 	fname = getInput(AGENTSUBSCREEN, "First name: ")
 	lname = getInput(AGENTSUBSCREEN, "Last name: ")
 	gender = getInput(AGENTSUBSCREEN, "Gender: ")
+	bday = getInput(AGENTSCREEN, "Birth Date: ")
 	bplace = getInput(AGENTSUBSCREEN, "Birth place: ")
 	m_fname = getInput(AGENTSUBSCREEN, "Mother's first name: ")
 	m_lname = getInput(AGENTSUBSCREEN, "Mother's last name: ")
 	f_fname = getInput(AGENTSUBSCREEN, "Father's first name: ")
 	f_lname = getInput(AGENTSUBSCREEN, "Father's last name: ")
-	# TODO Aryan : Check if both parents are in the database
-	motherFound = True
-	fatherFound = True
+	# TODO Aryan : Check if both parents are in the database DONE
+	pB = [m_fname, m_lname]
+	pA = [f_fname, f_lname]
+	intable =  m.checkParents(pA, pB)
+	motherFound = intable[1]
+	fatherFound = intable[0]
+	
 	if motherFound == False:
 		registerPerson(AGENTSUBSCREEN, "Mother")
 	if fatherFound == False:
 		registerPerson(AGENTSUBSCREEN, "Father")
-	# TODO Aryan : Register the birth
+	# TODO Aryan : Register the birth DONE
+	m.registerBirth(uid, fname, lname, gender, pA, pB, bday, bplace)
 	print("The birth has been recorded. Congratulations to the parents.")
 	print("===============================================================")
 	return
@@ -70,14 +79,18 @@ def registerMarriage():
 	p1_lname = getInput(AGENTSUBSCREEN, "Partner 1 last name: ")
 	p2_fname = getInput(AGENTSUBSCREEN, "Partner 2 first name: ")
 	p2_lname = getInput(AGENTSUBSCREEN, "Partner 2 last name: ")
-	# TODO Aryan : Check if both the partners are in the database
-	partner1Found = True
-	partner2Found = True
+	# TODO Aryan : Check if both the partners are in the database DONE
+	p1 = [p1_fname, p1_lname]
+	p2 = [p2_fname, p2_lname]
+	intable = m.checkPartners(p1, p2)
+	partner1Found = intable[0]
+	partner2Found = intable[1]
 	if partner1Found == False:
 		registerPerson(AGENTSUBSCREEN, "Partner 1")
 	if partner2Found == False:
 		registerPerson(AGENTSUBSCREEN, "Partner 2")
-	# TODO Aryan : Register the marriage
+	# TODO Aryan : Register the marriage DONE
+	m.registerMarrige(uid, p1, p2)
 	print("The marriage has been recorded. Congratulations to the couple.")
 	print("===============================================================")
 	return
@@ -88,12 +101,14 @@ def renewRegistration():
 	regnoValid = False
 	while regnoValid == False:
 		regno = getInput(AGENTSUBSCREEN, "Registration number: ")
-		# TODO Aryan : Verify if it's a valid registration number
-		if regnoValid == False:
+		# TODO Aryan : Verify if it's a valid registration number  DONE
+		valid = m.checkregno(regno)
+		if not(valid):
 			print("Registration number invalid, please try again...")
 		else:
 			break
-	# TODO Aryan : Set the new expiry data for the registration
+	m.renewRegistration(regno)
+	# TODO Aryan : Set the new expiry data for the registration DONE
 	print("The registration has been renewed.")
 	return
 
@@ -280,6 +295,8 @@ def registerPerson(personStr):
 		else:
 			break
 	# TODO Aryan : Store these values in the database
+	m.registerPerson(details['fname'], details['lname'], details['birthdate'], details['birthplace'], details['address'], details['phone'])
+
 	print("---------------------------------------------------------------")
 
 def printCommands(screen):
@@ -313,6 +330,7 @@ def registerPerson(parentScreen, personStr):
 		else:
 			break
 	# TODO Aryan : Store these values in the database
+	m.registerPerson(details['fname'], details['lname'], details['birthdate'], details['birthplace'], details['address'], details['phone'])
 	print("---------------------------------------------------------------")
 
 def printCommands(screen):
@@ -338,7 +356,18 @@ def getInput(screen, printStr):
 def getUserType(username, password):
 	# TODO Aryan : Validate the username and password logins
 	# TODO Aryan : Find the user's type
-	return 1
+	row = m.checkUser(username, password)
+	if row == 0:
+		return 0
+	else:
+		#print(row)
+		global uid 
+		uid = row[0] 
+		if row[1] == "Agent":
+			return 1
+		elif row[1] == "Traffic Officer":
+			return 2
+	
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:

@@ -6,8 +6,63 @@ with sqlite3.connect('p1.db') as db:
     c = db.cursor()
 
 # get the user city
-def getUserCity(c):
+def getUserCity(uid):
+    c = db.execute('''SELECT * FROM users WHERE uid = ?''', [uid])
+    #print(c.fetchone())
     return c.fetchone()[-1]
+
+def checkPartners(p1, p2):
+    c = db.execute('''SELECT * FROM persons WHERE fname = ? AND lname = ?''', p1)
+    row_a = c.fetchone()
+    c = db.execute('''SELECT * FROM persons WHERE fname = ? AND lname = ?''', p2)
+    row_b = c.fetchone()
+    if not(row_a == None) and not(row_b == None):
+        return [True, True]
+    
+    elif not(row_a == None) and row_b == None:
+        return [True, False]
+    elif row_a == None and not(row_b == None):
+        return [False, True]
+    else:
+        return [False, False]
+
+def checkregno(regno):
+    c = db.execute('''SELECT * FROM registrations WHERE regno = ? ''', [regno])
+    row = c.fetchone()
+    print(row)
+    if not(row == None):
+        return True
+    else:
+        return False
+
+
+
+def  checkParents(pA, pB):
+    c = db.execute('''SELECT * FROM persons WHERE fname = ? AND lname = ?''', pA)
+    row_a = c.fetchone()
+    c = db.execute('''SELECT * FROM persons WHERE fname = ? AND lname = ?''', pB)
+    row_b = c.fetchone()
+
+    if not(row_a == None) and not(row_b == None):
+        return [True, True]
+    
+    elif not(row_a == None) and row_b == None:
+        return [True, False]
+    elif row_a == None and not(row_b == None):
+        return [False, True]
+    else:
+        return [False, False]
+
+        
+def checkUser(uid, pwd):
+    c = db.execute('''SELECT * FROM users WHERE uid = ? AND pwd = ?''', [uid, pwd])
+    row = c.fetchone()
+    if row == None:
+        return 0  
+    elif not(row == None):
+        return [row[0], row[2]]
+
+
 
 def renewRegistration(regno):
     pdate = today.strftime("%Y-%m-%d")
@@ -71,6 +126,11 @@ def getDriverAbstract(fname, lname):
     total_dem = c.fetchone()[0]
     c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''')
     past2_dem = c.fetchone()[0]
+    c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
+    WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER by t.vdate desc''', [fname, lname])   
+    ticketRow = c.fetchall()
+
+
 
 def registerBirth(user, fname, lname, gender, parentA, parentB, bday, bplace):
     regplace = getUserCity(user)   
@@ -132,12 +192,17 @@ def registerMarrige(user, pA, pB):
     db.commit()
 
 
+def registerPerson(fname, lname, bdate, bplace, address, phone):
+    details = [fname, lname, bdate, bplace, address, phone]
+    db.execute('''INSERT INTO persons VALUES (?, ?, ?, ?, ?, ?)''', details)
+    db.commit()
 
 
 def main():
     
     #c = db.execute("SELECT * FROM users;")
-    #registerBirth(c, "g", "Singh", "female", ["kk", "Singh"], ["Seema","Singh"], "2008-04-11", "Allahabad")
+    uid = 1
+    registerBirth(uid, "o", "Singh", "female", ["kk", "Singh"], ["Seema","Singh"], "2008-04-11", "Allahabad")
     #regno = 1
     #c = db.execute('''SELECT * FROM registrations WHERE regno == ?''', [regno])
     #print(c.fetchone())
@@ -161,8 +226,14 @@ def main():
     num_dem = c.fetchone()[0]    
     c = db.execute('''SELECT SUM(points) FROM demeritNotices WHERE fname = ? AND lname = ? AND ddate > DATE('now', '-1 year')''', [fname, lname])
     past2_dem = c.fetchone()[0]
-    print(past2_dem)
-    
+    c = db.execute('''SELECT t.tno, t.vdate, t.violation, t.fine, t.regno, v.make, v.model FROM tickets t, vehicles v, registrations r 
+    WHERE t.regno = r.regno AND r.vin = v.vin AND r.fname = ? AND r.lname = ? ORDER BY t.vdate desc''', [fname, lname])   
+    ticketRow = c.fetchall()
+  
+    pA = ["Seea", "Singh"]
+    pB = ["kk", "Singh"]
+    #print(checkParents(pA, pB))
+
 
 if __name__ == '__main__':
     main()
