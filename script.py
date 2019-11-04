@@ -397,3 +397,4 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Please enter the name of the database as a command-line argument.")
         sys.exit()
+    startScreen(sys.argv[1])
