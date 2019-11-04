@@ -35,7 +35,7 @@ Group Work Strategy:
 	Luke was specifically responsible for doing as much of the project as possible without using the sqlite integration which was called front-end. Aryan being responsible for those wholes left, called back-end.
 
 	Work started on October 30th for the Python application. Work ended on November 30th.
-	Luke worked approximately 16 hours throughout the days stated, making progress on the design of the UI on Wednesday and Thursday mainly, and programming the UI on the remaining days.
+	Luke worked approximately 16 hours throughout the days stated, making progress on the design of the UI on Wednesday and Thursday mainly, and programming the UI and integrating the back-end on the remaining days. Part of the last couple days were spent helping with the back-end and integrating the back-end with the front end.
 
 	//
 
